@@ -10,7 +10,14 @@ var db = require("./models");
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-axios.get("https://www.philly.com/").then(function(response) {
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/philly_db";
+
+mongoose.connect(MONGODB_URI);
+
+
+
+
+axios.get("https://www.nytimes.com/section/sports").then(function(response) {
 
     const $ = cheerio.load(response.data);
 
@@ -19,27 +26,34 @@ axios.get("https://www.philly.com/").then(function(response) {
     // console.log($("tr td"));
     // console.log("#threadbits_forum_39");
  
-    $(".headline-link").each(function(i, element) {
+    $(".css-ye6x8s").each(function(i, element) {
 
-        console.log($(this).children("h4").text());
-        console.log($(this).children("a").attr("href"));
+        const articles = {
+             link: $(this).children(".css-1cp3ece").children(".css-4jyr1y").children("a").attr("href"),
+             title: $(this).children(".css-1cp3ece").children(".css-4jyr1y").children("a").children("h2").text()
+
+        }
+        console.log(articles);
+
         
-        results.title = $(this).children("h4").text();
-        results.link = $(this).children("a").attr("href");
+        
+        // results.title = $(this).children("h4").text();
+        // results.link = $(this).children("a").attr("href");
 
-        db.Article.create(results)
-          .then(function(dbArticle) {
-              console.log(dbArticle);
-          })
-          .catch(function(error) {
-              console.log(error);
-          });
+        // db.Article.create(results)
+        //   .then(function(dbArticle) {
+        //       console.log(dbArticle);
+        //   })
+        //   .catch(function(error) {
+        //       console.log(error);
+        //   });
         
         
     });
     console.log(results);
 
 });
+
 
 //setup handlebars
 app.engine('handlebars', exphbs({defaultLayout: 'main'}));
